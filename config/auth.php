@@ -41,13 +41,12 @@ return [
             'provider' => 'users',
         ],
 
-        'api'=> [
+        'api' => [
             'driver' => 'passport',
             'provider' => 'users',
         ]
     ],
 
-    
     /*
     |--------------------------------------------------------------------------
     | User Providers

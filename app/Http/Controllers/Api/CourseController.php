@@ -17,7 +17,6 @@ class CourseController extends Controller
                 'message' => 'Retrieve All Success',
                 'data' => $courses
             ],200);
-            
         }
         return response([
             'message' => 'Empty',
@@ -35,7 +34,7 @@ class CourseController extends Controller
         }
         return response([
             'message' => 'Course Not Found',
-            'data' => $course
+            'data' => null
         ],404);
     }
 
@@ -43,7 +42,7 @@ class CourseController extends Controller
     {
         $storeData = $request->all();
         $validate = Validator::make($storeData, [
-            'nama_kelas' => 'required|max:60|unique:course',
+            'nama_kelas' => 'required|max:60|unique:courses',
             'kode' => 'required',
             'biaya_pendaftaran' => 'required|numeric',
             'kapasitas' => 'required|numeric'
@@ -54,14 +53,14 @@ class CourseController extends Controller
         
         $course =Course::create($storeData);
         return response([
-            'message' => 'Register Success',
+            'message' => 'Add Course Success',
             'user' => $course
         ],200);
     }
     
     public function destroy($id){
         $course =Course::find($id);
-        if(!is_null($course)){
+        if(is_null($course)){
             return response([
             'message' => 'Course Not Found',
             'data' => $course
@@ -75,13 +74,13 @@ class CourseController extends Controller
         }
         return response([
             'message' => 'Delete Course Failed',
-            'data' => $course
+            'data' => null
         ],400);
     }
 
     public function update(Request $request, $id){
         $course =Course::find($id);
-        if(!is_null($course)){
+        if(is_null($course)){
             return response([
             'message' => 'Course Not Found',
             'data' => null
@@ -89,8 +88,8 @@ class CourseController extends Controller
         }
 
         $updateData=$request->all();
-        $validate = Validator::make($storeData, [
-            'nama_kelas' => ['required','max:60',Rule::unique('course')->ignore($course)],
+        $validate = Validator::make($updateData, [
+            'nama_kelas' => ['required','max:60',Rule::unique('courses')->ignore($course)],
             'kode' => 'required',
             'biaya_pendaftaran' => 'required|numeric',
             'kapasitas' => 'required|numeric'
@@ -111,7 +110,7 @@ class CourseController extends Controller
         
         return response([
             'message' => 'Update Course Failed',
-            'data' => $course
+            'data' => null
         ],400);
     }
 }

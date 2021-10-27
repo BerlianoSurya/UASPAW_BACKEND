@@ -43,7 +43,7 @@ class AuthController extends Controller
         $token = $user->createToken('Authentication Token')->accessToken;
         
         return response([
-            'message' => 'Register Success',
+            'message' => 'Authenticated',
             'user' => $user,
             'token_type' => 'Bearer',
             'access_token' => $token
