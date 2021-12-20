@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 // use Laravel\Sanctum\HasApiTokens;
 use Laravel\Passport\HasApiTokens;
 use Carbon\Carbon;
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -20,7 +20,10 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'alamat',
         'email',
+        'judul_foto',
+        'path_foto',
         'password',
     ];
 
@@ -55,4 +58,17 @@ class User extends Authenticatable
             return Carbon::parse($this->attributes['updated_at'])->format('Y-m-d H:i:s');
         }
     }
+
+    public function feeds()
+    {
+        return $this->hasMany('App\Models\Feed','usersid');
+    }
+    public function markets()
+    {
+        return $this->hasMany('App\Models\Market','usersid');
+    }
+    public function komenfeeds()
+    {
+        return $this->hasMany('App\Models\Komenfeed','usersid');
+    }   
 }

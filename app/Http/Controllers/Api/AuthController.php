@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Validator;
-
+use Illuminate\Auth\Events\Registered;
 class AuthController extends Controller
 {
     public function register(Request $request)
@@ -23,13 +23,13 @@ class AuthController extends Controller
 
         $registrationData['password'] = bcrypt($request->password);
         $user =User::create($registrationData);
+        event(new Registered($user));
         return response([
             'message' => 'Register Success',
             'user' => $user
         ],200);
     }
     
-
     public function login(Request $request)
     {
         $loginData = $request->all();
@@ -50,5 +50,112 @@ class AuthController extends Controller
         ]);
     }
     
+    public function logout(Request $request) {
+        $request->user()->token()->revoke();
+    
+        return response([
+           'message' => 'Successfully logged out',
+           'user' => $user
+        ],200);
+      }
+
+    public function index(){
+        $users =User::all();
+        if(count($users)>0){
+            return response([
+                'message' => 'Retrieve All Success',
+                'data' => $users
+            ],200);
+        }
+        return response([
+            'message' => 'Empty',
+            'data' => null
+        ],400);
+    }
+
+    public function show($id){
+        $user =User::find($id);
+        if(!is_null($user)){
+            return response([
+                'message' => 'Retrieve user Success',
+                'data' => $user
+            ],200);
+        }
+        return response([
+            'message' => 'user Not Found',
+            'data' => null
+        ],404);
+    }
+
+    public function destroy($id){
+        $user =User::find($id);
+        if(is_null($user)){
+            return response([
+            'message' => 'user Not Found',
+            'data' => $user
+            ],404);
+        }
+        if($user->delete()){
+            return response([
+                'message' => 'Delete user Success',
+                'data' => $user
+            ],200);
+        }
+        return response([
+            'message' => 'Delete user Failed',
+            'data' => null
+        ],400);
+    }
+
+    public function update(Request $request, $id){
+        $user =User::find($id);
+        if(is_null($user)){
+            return response([
+            'message' => 'user Not Found',
+            'data' => null
+            ],404);
+        }
+
+        $updateData=$request->all();
+        $validate = Validator::make($updateData, [
+            'name' => 'required','max:60',
+            'alamat' => 'required',
+        ]);
+        if($validate->fails()) 
+        return response(['message' =>$validate->errors()],400);
+
+        $user->name=$updateData['name'];
+        $user->alamat   =$updateData['alamat'];
+        if($user->save()){
+            return response([
+                'message' => 'Update user Success',
+                'data' => $user
+            ],200);
+        }
+        
+        return response([
+            'message' => 'Update user Failed',
+            'data' => null
+        ],400);
+    }
+
+    public function store(Request $request)
+    {
+        $storeData = $request->all();
+        $validate = Validator::make($storeData, [
+            'name' => 'required|max:60|unique:users',
+            'email' => 'required',
+            'password' => 'required',
+        ]);
+        if($validate->fails()) 
+        return response(['message' =>$validate->errors()],400);
+
+        
+        $user =User::create($storeData);
+        return response([
+            'message' => 'Add Course Success',
+            'user' => $user
+        ],200);
+    }
 }
 

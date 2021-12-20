@@ -49,7 +49,6 @@ class CourseController extends Controller
         ]);
         if($validate->fails()) 
         return response(['message' =>$validate->errors()],400);
-
         
         $course =Course::create($storeData);
         return response([
